@@ -8,4 +8,5 @@ userRouter
   .delete(endPoint.deleteusers);
   userRouter.get("/getusers", endPoint.getusers);
   userRouter.get("/userdata" , endPoint.getuserdata);
+  userRouter.put("/volunteer" , endPoint.beVolunteer);
 export default userRouter;

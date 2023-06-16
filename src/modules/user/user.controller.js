@@ -25,3 +25,12 @@ export const deleteusers = catchError(async(req,res,next)=>{
     await userModel.deleteMany();
     res.status(200).json({ message: "success"});
 });
+export const beVolunteer = catchError(async(req,res,next)=>{
+    const {id , nationalId} = req.body;
+    const user = await userModel.findById(id);
+    if(!user) next(new AppError('Not Found user' , 400));
+    user.national_id = nationalId;
+    user.volunteer = true;
+    await user.save();
+    res.status(200).json({ message: "success"});
+})
