@@ -3,12 +3,12 @@ import countryModel from "../../../database/models/country.js";
 import financeModel from "../../../database/models/finance.js";
 
 export const updateDonationBox = async (box, amount) => {
-  box.raised += amount;
+  box.raised = (box.raised * 1) +( amount * 1);
   if (box.raised >= box.amount) {
     box.left = 0;
     box.completed = true;
   } else {
-    box.left -= amount;
+    box.left = (box.left * 1) - (amount *1);
   }
   console.log(box);
   return await box.save();
