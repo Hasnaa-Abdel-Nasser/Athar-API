@@ -10,7 +10,7 @@ export const addcharity = catchError(async(req,res,next)=>{
 
 export const getcharity = catchError(async(req,res,next)=>{
     const total = await charityModel.countDocuments({});
-      const totalPages = Math.ceil(total / 10);
+      const totalPages = Math.ceil(total / 12);
       let features = new ApiFeatures(charityModel.find(), req.query)
         .sort()
         .paginate(totalPages)
@@ -29,3 +29,10 @@ export const deleteusers = catchError(async(req,res,next)=>{
     await charityModel.deleteMany();
     res.status(200).json({ message: "success"});
 });
+export const verifyCharity = catchError(async(req,res,next)=>{
+  const charity = await charityModel.findById(req.query.id);
+  if(!charity) return next(new AppError("Not Found", 400));
+  charity.verified = !charity.verified;
+  await charity.save();
+    res.status(200).json({ message: "success"});
+})
