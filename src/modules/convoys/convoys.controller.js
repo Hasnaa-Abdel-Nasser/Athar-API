@@ -20,16 +20,6 @@ export const addConvoy = catchError(async (req, res, next) => {
   );
   if (!findCountry || !findCharity)
     return next(new AppError("Could not find the charity or country", 400));
-  // Check if the start and end dates of a new convoy fall within the date range of any existing convoys.
-  const existingConvoy = await convoyModel.findOne({
-    charityId: charityId,
-    $and: [{ startDate: { $lte: endDate } }, { endDate: { $gte: startDate } }],
-  });
-  if (existingConvoy) {
-    return next(
-      new AppError("There is already a convoy in the specified date range", 400)
-    );
-  }
   // check if charity input invalid range to volunteers.
   // valid range ---> 500 volunteers
   const totalCount = jobs.reduce((acc, job) => acc + job.count, 0);
@@ -207,7 +197,7 @@ export const deleteUserFromConvoy = catchError(async (req, res, next) => {
     { $pull: { convoys: _id } }
   );
   if (!user) return next(new AppError("User not found in this convoy", 400));
-  const convoy = await convoyModel.findOneAndUpdate(
+  let convoy = await convoyModel.findOneAndUpdate(
     // Delete user from convoy data
     { _id, "jobs.job": user.job.toLowerCase() },
     {
@@ -219,9 +209,24 @@ export const deleteUserFromConvoy = catchError(async (req, res, next) => {
       arrayFilters: [{ "job.job": user.job.toLowerCase() }], // to only update the job field in those objects
     }
   );
-  if (!convoy)
-    return next(new AppError("Faild remove user from this convoy", 400));
-  await charityModel.findByIdAndUpdate(convoy.charityId, {
+  if (!convoy){
+    let convoyOther = await convoyModel.findOneAndUpdate(
+      // Delete user from convoy data
+      { _id, "jobs.job": 'other' },
+      {
+        $pull: { "jobs.$[job].usersId": userId },
+        $set: { "jobs.$[job].completed": false, completed: false },
+      },
+      {
+        new: true,
+        arrayFilters: [{ "job.job": 'other' }], // to only update the job field in those objects
+      }
+    );
+    if(!convoyOther) return next(new AppError("Faild remove user from this convoy", 400));
+      convoy = convoyOther;
+  }
+  
+    await charityModel.findByIdAndUpdate(convoy.charityId, {
     $inc: { volunteers: -1 },
   });
   await countryModel.findByIdAndUpdate(convoy.countryId, {
