@@ -354,7 +354,7 @@ export const convoysPdf = catchError(async (req, res, next) => {
   const { id } = req.params;
   const convoy = await convoyModel
     .findById(id)
-    .populate({ path: "jobs.usersId", select: "-_id name phone country job" });
+    .populate({ path: "jobs.usersId", select: "-_id name phone country job national_id" });
   if (!convoy) return next(new AppError("Convoy not fount or not completed"));
   const pdf = await createInvoice(convoy);
   console.log(pdf);
