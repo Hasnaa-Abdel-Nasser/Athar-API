@@ -127,12 +127,12 @@ export const addConvoy = catchError(async (req, res, next) => {
 //     res.status(200).json({ message: "success", user });
 //   }
 // });
-export const addUserToConvoy = async (req, res) => {
+export const addUserToConvoy = async (req, res,next) => {
   try {
     const { _id, userId } = req.body;
 
     const user = await userModel.findOne({ _id: userId });
-    if (!user) throw new AppError("Could not add user to convoy", 400);
+    if (!user)  return next(new AppError("Could not add user to convoy", 400));
 
     let convoy = await convoyModel.findOne({
       _id,
@@ -156,14 +156,14 @@ export const addUserToConvoy = async (req, res) => {
     const jobIndex = convoy.jobs.findIndex((obj) => obj.job === jobData);
     const job = convoy.jobs[jobIndex];
 
-    if (job.completed) throw new AppError("Cannot add user to a completed job.", 400);
+    if (job.completed) return next(new AppError("Cannot add user to a completed job.", 400));
 
     const beforeAddUser = job.usersId.length;
     convoy.jobs[jobIndex].usersId.addToSet(userId);
     const updatedConvoy = await convoy.save();
     const totalUsers = job.usersId.length;
 
-    if (totalUsers == beforeAddUser) throw new AppError("User already in this convoy.", 400);
+    if (totalUsers == beforeAddUser) return next(new AppError("User already in this convoy.", 400));
 
     await userModel.findByIdAndUpdate(userId, { $addToSet: { convoys: _id } });
 
@@ -185,7 +185,7 @@ export const addUserToConvoy = async (req, res) => {
 
     res.status(200).json({ message: "success", user });
   } catch (error) {
-    res.status(error.statusCode || 500).json({ message: error.message });
+    console.log(error)
   }
 };
 
