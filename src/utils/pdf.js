@@ -19,7 +19,6 @@ export async function createInvoice(invoice) {
 }
 function generateHeader(doc) {
   doc
-    // .image("logo.png", 45, 45, { width: 60 })
     .fillColor("#444444")
     .fontSize(20)
     .text("Athar", 50, 65)

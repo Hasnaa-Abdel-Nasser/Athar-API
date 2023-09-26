@@ -7,6 +7,7 @@ import { AppError } from "../../utils/response.error.js";
 import { ApiFeatures } from "../../utils/api.features.js";
 import * as manage from "./convoys.manage.js";
 import { createInvoice } from "../../utils/pdf.js";
+
 export const addConvoy = catchError(async (req, res, next) => {
   const { charityId, countryId, jobs, totalVolunteers, startDate, endDate } =
     req.body;
@@ -36,97 +37,6 @@ export const addConvoy = catchError(async (req, res, next) => {
   res.status(200).json({ message: "success", convoy });
 });
 
-//join new user
-// export const addUserToConvoy = catchError(async (req, res, next) => {
-//   const { _id, userId } = req.body;
-//   //check if the user exists in the database and has the same job assigned to them for this convoy.
-//   const user = await userModel.findOne({ _id: userId });
-//   if (!user) return next(new AppError("Could not add user to convoy", 400));
-//   let convoy = await convoyModel.findOne({
-//     _id,
-//     "jobs.job": user.job.toLowerCase(),
-//     completed: false,
-//   });
-//   let convoyOther = await convoyModel.findOne({
-//     _id,
-//     "jobs.job": 'other',
-//     completed: false,
-//   });
-//   console.log(convoyOther)
-//   if (!convoy && !convoyOther) return next(new AppError("Could not add user to convoy", 400));
-//   //  check if the job section has been completed or not.
-//   if(convoy){
-//     const jobIndex = convoy.jobs.findIndex((obj) => obj.job === user.job.toLowerCase());
-//     let job = convoy.jobs[jobIndex];
-//     let beforeAddUser = job.usersId.length;
-//     if (job.completed)
-//       return next(new AppError("Cannot add user to a completed job.", 400));
-//     convoy = await convoyModel.findOneAndUpdate(
-//       //Add user to this convoy
-//       { _id, "jobs.job": user.job.toLowerCase() },
-//       { $addToSet: { "jobs.$.usersId": userId } },
-//       { new: true }
-//     );
-//     job = convoy.jobs[jobIndex];
-//     let totalUsers = job.usersId.length;
-//     if (totalUsers == beforeAddUser)
-//       return next(new AppError("User alredy in this convoy.", 400));
-//     await userModel.findByIdAndUpdate(userId, { $addToSet: { convoys: _id } }); // Add convoy to "list convoys" in user
-//     if (job.usersId.length === job.count) {
-//       // if the job section has been completed or not after add new user.
-//       convoy.jobs[jobIndex].completed = true;
-//       await convoy.save();
-//     }
-//     const jobsCompleted = convoy.jobs.every((job) => job.completed);
-//     if (jobsCompleted) {
-//       // if convoy completed after new user or not
-//       convoy.completed = true;
-//       await convoy.save();
-//     }
-//     const charity = await charityModel.findByIdAndUpdate(convoy.charityId, {
-//       $inc: { volunteers: 1 },
-//     });
-//     const country = await countryModel.findByIdAndUpdate(convoy.countryId, {
-//       $inc: { volunteers: 1 },
-//     });
-//     res.status(200).json({ message: "success", user });
-//   }else{
-//     const jobIndex = convoyOther.jobs.findIndex((obj) => obj.job === 'other');
-//     let job = convoyOther.jobs[jobIndex];
-//     let beforeAddUser = convoyOther.usersId.length;
-//     if (job.completed)
-//       return next(new AppError("Cannot add user to a completed job.", 400));
-//       convoyOther = await convoyModel.findOneAndUpdate(
-//       //Add user to this convoy
-//       { _id, "jobs.job": 'other' },
-//       { $addToSet: { "jobs.$.usersId": userId } },
-//       { new: true }
-//     );
-//     job = convoyOther.jobs[jobIndex];
-//     let totalUsers = job.usersId.length;
-//     if (totalUsers == beforeAddUser)
-//       return next(new AppError("User alredy in this convoy.", 400));
-//     await userModel.findByIdAndUpdate(userId, { $addToSet: { convoys: _id } }); // Add convoy to "list convoys" in user
-//     if (job.usersId.length === job.count) {
-//       // if the job section has been completed or not after add new user.
-//       convoy.jobs[jobIndex].completed = true;
-//       await convoyOther.save();
-//     }
-//     const jobsCompleted = convoyOther.jobs.every((job) => job.completed);
-//     if (jobsCompleted) {
-//       // if convoy completed after new user or not
-//       convoyOther.completed = true;
-//       await convoyOther.save();
-//     }
-//     const charity = await charityModel.findByIdAndUpdate(convoyOther.charityId, {
-//       $inc: { volunteers: 1 },
-//     });
-//     const country = await countryModel.findByIdAndUpdate(convoyOther.countryId, {
-//       $inc: { volunteers: 1 },
-//     });
-//     res.status(200).json({ message: "success", user });
-//   }
-// });
 export const addUserToConvoy = async (req, res,next) => {
   try {
     const { _id, userId } = req.body;

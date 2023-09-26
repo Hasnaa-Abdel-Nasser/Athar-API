@@ -6,6 +6,7 @@ import { asyncHandler } from "../../../utils/errorHandling.js";
 import sendEmail from '../../../utils/email.js'
 import adminModel from "../../../../database/models/admin.js";
 import { nanoid ,customAlphabet} from 'nanoid';
+import { catchError } from "../../../middleware/catch.errors.js";
 
 
 
@@ -558,6 +559,15 @@ export const resetPassword = asyncHandler(async (req, res, next) => {
 
 })
 
+export const beVolunteer = catchError(async(req,res,next)=>{
+    const {id , nationalId} = req.body;
+    const user = await userModel.findById(id);
+    if(!user) next(new AppError('Not Found user' , 400));
+    user.national_id = nationalId;
+    user.volunteer = true;
+    await user.save();
+    res.status(200).json({ message: "success"});
+})
 
 export const logout= asyncHandler(async (req, res, next) =>{
     const {id,role}=req.body;

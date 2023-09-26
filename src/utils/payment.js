@@ -21,18 +21,4 @@ async function payment({
     });
     return session;
 }
-//mode : payment دفع
-//mode : subscription  بسحب من الفيزا لو مشترك في حاجه
-
-// :[
-//     {
-//         donate_data : {
-//             currency,
-//             donation_data:{
-//                 country_name,
-//             },
-//             amount,
-//         }
-//     }
-// ]
 export default payment;

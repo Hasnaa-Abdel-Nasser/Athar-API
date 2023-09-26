@@ -14,6 +14,7 @@ authRouter.post('/login',validation(validators.login),authController.login)
 authRouter.post('/sendCode',validation(validators.sendCode),authController.sendCode)
 authRouter.post('/confirmCode',validation(validators.confirmCode),authController.confirmCode)
 authRouter.put('/resetPassword',validation(validators.resetPassword),authController.resetPassword)
+authRouter.patch('/volunteer' , authController.beVolunteer)
 authRouter.post('/logout',validation(validators.logout),authController.logout)
 
 export default authRouter
